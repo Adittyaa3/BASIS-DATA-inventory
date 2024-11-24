@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use PDO;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -12,14 +12,40 @@ class PengadaanPenerimaanController extends Controller
     public function createPengadaan()
     {
         $pdo = DB::connection()->getPdo();
-        
-        // Ambil data vendor dan barang dari database
-        $vendors = $pdo->query("SELECT * FROM vendor WHERE status = 1")->fetchAll();
-        $barang = $pdo->query("SELECT * FROM barang WHERE status = 1")->fetchAll();
-        $pengadaans = $pdo->query("SELECT p.*, v.nama_vendor FROM pengadaan p JOIN vendor v ON p.vendor_id_vendor = v.id_vendor")->fetchAll();
 
-        return view('pengadaan.create', compact('vendors', 'barang','pengadaans'));
+        // Ambil data vendor dan barang dari database
+        $vendors = $pdo->query("SELECT * FROM vendor WHERE status = 1")->fetchAll(PDO::FETCH_ASSOC);
+        $barang = $pdo->query("SELECT * FROM barang WHERE status = 1")->fetchAll(PDO::FETCH_ASSOC);
+        $pengadaans = $pdo->query("
+            SELECT p.*, v.nama_vendor
+            FROM pengadaan p
+            JOIN vendor v ON p.vendor_id_vendor = v.id_vendor
+        ")->fetchAll(PDO::FETCH_ASSOC);
+
+        // Tambahkan status penerimaan pada setiap pengadaan
+        foreach ($pengadaans as &$pengadaan) {
+            // Total jumlah barang dipesan
+            $totalPesananQuery = $pdo->prepare("SELECT SUM(jumlah) FROM detail_pengadaan WHERE id_pengadaan = ?");
+            $totalPesananQuery->execute([$pengadaan['id_pengadaan']]);
+            $totalPesanan = $totalPesananQuery->fetchColumn();
+
+            // Total jumlah barang diterima
+            $totalDiterimaQuery = $pdo->prepare("
+                SELECT SUM(jumlah_terima) FROM detail_penerimaan
+                WHERE id_penerimaan IN (
+                    SELECT id_penerimaan FROM penerimaan WHERE id_pengadaan = ?
+                )
+            ");
+            $totalDiterimaQuery->execute([$pengadaan['id_pengadaan']]);
+            $totalDiterima = $totalDiterimaQuery->fetchColumn() ?? 0;
+
+            // Tentukan status penerimaan
+            $pengadaan['status_penerimaan'] = ($totalPesanan == $totalDiterima) ? 'Selesai' : 'Belum Selesai';
+        }
+
+        return view('pengadaan.create', compact('vendors', 'barang', 'pengadaans'));
     }
+
 
     // Menyimpan data pengadaan beserta detailnya
     public function storePengadaan(Request $request)
@@ -67,13 +93,43 @@ class PengadaanPenerimaanController extends Controller
     }
 
     // // Menampilkan daftar pengadaan
-     public function indexPengadaan()
-     {
-         $pdo = DB::connection()->getPdo();
-         $pengadaans = $pdo->query("SELECT p.*, v.nama_vendor FROM pengadaan p JOIN vendor v ON p.vendor_id_vendor = v.id_vendor")->fetchAll();
-       
-         return view('pengadaan.index', compact('pengadaans'));
+    public function indexPengadaan()
+    {
+        $pdo = DB::connection()->getPdo();
+
+        // Ambil data pengadaan
+        $pengadaans = $pdo->query("
+            SELECT p.*, v.nama_vendor
+            FROM pengadaan p
+            JOIN vendor v ON p.vendor_id_vendor = v.id_vendor
+        ")->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($pengadaans as &$pengadaan) {
+            // Hitung total jumlah barang yang dipesan
+            $totalPesananQuery = $pdo->prepare("
+                SELECT SUM(jumlah) FROM detail_pengadaan WHERE id_pengadaan = ?
+            ");
+            $totalPesananQuery->execute([$pengadaan['id_pengadaan']]);
+            $totalPesanan = $totalPesananQuery->fetchColumn();
+
+            // Hitung total jumlah barang yang sudah diterima
+            $totalDiterimaQuery = $pdo->prepare("
+                SELECT SUM(jumlah_terima) FROM detail_penerimaan
+                WHERE id_penerimaan IN (
+                    SELECT id_penerimaan FROM penerimaan WHERE id_pengadaan = ?
+                )
+            ");
+            $totalDiterimaQuery->execute([$pengadaan['id_pengadaan']]);
+            $totalDiterima = $totalDiterimaQuery->fetchColumn() ?? 0;
+
+            // Tambahkan status penerimaan
+            $pengadaan['status_penerimaan'] = ($totalPesanan == $totalDiterima) ? 'Selesai' : 'Belum Selesai';
+        }
+
+        return view('pengadaan.index', compact('pengadaans'));
     }
+
+
 
     // Menampilkan detail pengadaan berdasarkan ID
     public function detailPengadaan($id_pengadaan)
@@ -93,64 +149,78 @@ class PengadaanPenerimaanController extends Controller
 
     // Menampilkan form penerimaan barang berdasarkan ID pengadaan
     public function createPenerimaan($id_pengadaan)
-    {
-        $pdo = DB::connection()->getPdo();
+{
+    $pdo = DB::connection()->getPdo();
 
-        $pengadaan = $pdo->prepare("SELECT * FROM pengadaan WHERE id_pengadaan = ?");
-        $pengadaan->execute([$id_pengadaan]);
-        $pengadaan = $pengadaan->fetch();
+    // Ambil data pengadaan
+    $pengadaanQuery = $pdo->prepare("SELECT * FROM pengadaan WHERE id_pengadaan = ?");
+    $pengadaanQuery->execute([$id_pengadaan]);
+    $pengadaan = $pengadaanQuery->fetch(PDO::FETCH_ASSOC);
 
-        $barangItems = $pdo->prepare("SELECT dp.*, b.nama FROM detail_pengadaan dp JOIN barang b ON dp.id_barang = b.id_barang WHERE dp.id_pengadaan = ?");
-        $barangItems->execute([$id_pengadaan]);
-        $barangItems = $barangItems->fetchAll();
+    // Ambil barang terkait pengadaan
+    $barangItemsQuery = $pdo->prepare("
+        SELECT
+            dp.id_barang,
+            b.nama AS nama_barang,
+            dp.jumlah AS jumlah_dipesan,
+            COALESCE(SUM(dp_terima.jumlah_terima), 0) AS jumlah_diterima
+        FROM detail_pengadaan dp
+        JOIN barang b ON dp.id_barang = b.id_barang
+        LEFT JOIN detail_penerimaan dp_terima ON dp.id_barang = dp_terima.barang_id_barang
+            AND dp_terima.id_penerimaan IN (
+                SELECT id_penerimaan FROM penerimaan WHERE id_pengadaan = ?
+            )
+        WHERE dp.id_pengadaan = ?
+        GROUP BY dp.id_barang, dp.jumlah, b.nama
+    ");
+    $barangItemsQuery->execute([$id_pengadaan, $id_pengadaan]);
+    $barangItems = $barangItemsQuery->fetchAll(PDO::FETCH_ASSOC);
 
-        return view('terima.create', compact('pengadaan', 'barangItems'));
+    return view('terima.create', compact('pengadaan', 'barangItems'));
+}
+
+public function storePenerimaan(Request $request, $id_pengadaan)
+{
+    $pdo = DB::connection()->getPdo();
+
+    // Pastikan user sudah login
+    $user = session('user');
+    if (!$user) {
+        return redirect()->route('login')->withErrors('Anda harus login terlebih dahulu');
     }
 
-    // Menyimpan data penerimaan barang beserta detailnya
-    public function storePenerimaan(Request $request, $id_pengadaan)
-    {
-        $pdo = DB::connection()->getPdo();
+    $userId = $user['id_user'];
 
-        $request->validate([
-            'barang.*.id_barang' => 'required|integer',
-            'barang.*.jumlah_terima' => 'required|integer|min:1',
-        ]);
+    try {
+        $pdo->beginTransaction();
 
-        try {
-            $pdo->beginTransaction();
-
-            // Simpan data penerimaan
-            $stmt = $pdo->prepare("INSERT INTO penerimaan (created_at, id_pengadaan, status, id_user) VALUES (NOW(), ?, 'A', ?)");
-            $stmt->execute([$id_pengadaan, Auth::id()]);
-            $idPenerimaan = $pdo->lastInsertId();
-
-            // Simpan detail penerimaan dan update stok
-            foreach ($request->barang as $item) {
-                $barang = $pdo->prepare("SELECT harga FROM barang WHERE id_barang = ?");
-                $barang->execute([$item['id_barang']]);
-                $hargaSatuan = $barang->fetchColumn();
-                $subTotal = $hargaSatuan * $item['jumlah_terima'];
-
-                // Simpan ke detail penerimaan
-                $stmt = $pdo->prepare("INSERT INTO detail_penerimaan (id_penerimaan, id_barang, jumlah_terima, harga_satuan_terima, sub_total_terima) VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$idPenerimaan, $item['id_barang'], $item['jumlah_terima'], $hargaSatuan, $subTotal]);
-
-                // Update stok di kartu_stok
-                $currentStock = $pdo->prepare("SELECT stock FROM kartu_stok WHERE id_barang = ? ORDER BY created_at DESC LIMIT 1");
-                $currentStock->execute([$item['id_barang']]);
-                $currentStock = $currentStock->fetchColumn() ?? 0;
-                $newStock = $currentStock + $item['jumlah_terima'];
-
-                $stmt = $pdo->prepare("INSERT INTO kartu_stok (id_barang, jenis_transaksi, masuk, keluar, stock, created_at, id_transaksi) VALUES (?, 'M', ?, 0, ?, NOW(), ?)");
-                $stmt->execute([$item['id_barang'], $item['jumlah_terima'], $newStock, $id_pengadaan]);
-            }
-
-            $pdo->commit();
-            return redirect()->route('pengadaan.index')->with('success', 'Penerimaan berhasil disimpan dan stok diperbarui');
-        } catch (\Exception $e) {
-            $pdo->rollBack();
-            return back()->withErrors(['error' => 'Gagal menyimpan penerimaan: ' . $e->getMessage()]);
+        foreach ($request->barang as $item) {
+            // Panggil stored procedure
+            $stmt = $pdo->prepare("CALL sp_store_penerimaan(?, ?, ?, ?)");
+            $stmt->execute([$id_pengadaan, $item['id_barang'], $item['jumlah_terima'], $userId]);
         }
+
+        $pdo->commit();
+        return redirect()->route('penerimaan.index')->with('success', 'Penerimaan berhasil disimpan.');
+    } catch (\Exception $e) {
+        $pdo->rollBack();
+        return back()->withErrors(['error' => 'Gagal menyimpan penerimaan: ' . $e->getMessage()]);
     }
+}
+
+public function indexPenerimaan()
+{
+    $pdo = DB::connection()->getPdo();
+
+    // Query data dari view_penerimaan_barang
+    $dataPenerimaan = $pdo->query("SELECT * FROM view_penerimaan_barang")->fetchAll(PDO::FETCH_ASSOC);
+
+    return view('terima.index', compact('dataPenerimaan'));
+}
+
+
+
+
+
+
 }

@@ -5,7 +5,7 @@
         <div class="row">
             <div class="card-body">
                 <h5 class="card-title fw-semibold mb-4">Buat Pengadaan Baru</h5>
-                
+
                 {{-- Display Errors --}}
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -14,7 +14,7 @@
                         @endforeach
                     </div>
                 @endif
-                
+
                 <form action="{{ route('pengadaan.store') }}" method="POST">
                     @csrf
 
@@ -80,6 +80,7 @@
                                     <th class="border-bottom-0"><h6 class="fw-semibold mb-0">ID</h6></th>
                                     <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Vendor</h6></th>
                                     <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Total Nilai</h6></th>
+                                    <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Status</h6></th>
                                     <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Aksi</h6></th>
                                 </tr>
                             </thead>
@@ -90,13 +91,26 @@
                                     <td class="border-bottom-0"><h6 class="fw-semibold mb-0">{{ $pengadaan['nama_vendor'] }}</h6></td>
                                     <td class="border-bottom-0"><h6 class="fw-semibold mb-0">{{ $pengadaan['total_nilai'] }}</h6></td>
                                     <td class="border-bottom-0">
-                                        <a href="{{ route('penerimaan.create', $pengadaan['id_pengadaan']) }}" class="btn btn-primary btn-sm">Terima Barang</a>
+                                        @if($pengadaan['status_penerimaan'] == 'Selesai')
+                                            <span class="badge bg-success">Barang sudah diterima</span>
+                                        @else
+                                            <a href="{{ route('penerimaan.create', $pengadaan['id_pengadaan']) }}" class="btn btn-primary btn-sm">Terima Barang</a>
+                                        @endif
+                                    </td>
+
+                                    <td class="border-bottom-0">
+                                        @if($pengadaan['status_penerimaan'] != 'Selesai')
+                                            <a href="{{ route('penerimaan.create', $pengadaan['id_pengadaan']) }}" class="btn btn-primary btn-sm">Terima Barang</a>
+                                        @else
+                                            <button class="btn btn-secondary btn-sm" disabled>Sudah Selesai</button>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -130,8 +144,8 @@
         const parent = quantityInput.closest('.barang-item');
         const harga = parseFloat(parent.querySelector('.harga-satuan').value) || 0;
         const quantity = parseInt(quantityInput.value) || 0;
-        const subtotal = harga * quantity;
-        parent.querySelector('.subtotal').value = subtotal;
+        const subtotal = harga * quantity ;
+        parent.querySelector('.subtotal').value = subtotal + (subtotal*0.11);
         updateTotalSubtotal();
     }
 

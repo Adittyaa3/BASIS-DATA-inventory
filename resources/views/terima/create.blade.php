@@ -2,33 +2,54 @@
 
 @section('content')
 <div class="container">
-    <h2>Penerimaan Barang untuk Pengadaan ID: {{ $pengadaan ? $pengadaan['id_pengadaan'] : 'Data tidak ditemukan' }}</h2>
+    <h2 class="mb-4">Penerimaan Barang untuk Pengadaan ID: {{ $pengadaan['id_pengadaan'] ?? 'Data tidak ditemukan' }}</h2>
 
-    @if(!$barangItems)
-        <p>Data barang tidak ditemukan atau kosong.</p>
-    @else
-        <form action="{{ route('penerimaan.store', $pengadaan['id_pengadaan']) }}" method="POST">
-            @csrf
-            @foreach ($barangItems as $index => $item)
-                <div class="form-group row">
-                    <div class="col">
-                        <label>Nama Barang</label>
-                        <input type="text" class="form-control" value="{{ $item['nama'] }}" readonly>
-                        <input type="hidden" name="barang[{{ $index }}][id_barang]" value="{{ $item['id_barang'] }}">
-                    </div>
-                    <div class="col">
-                        <label>Jumlah Dipesan</label>
-                        <input type="number" class="form-control" value="{{ $item['jumlah'] }}" readonly>
-                    </div>
-                    <div class="col">
-                        <label>Jumlah Diterima</label>
-                        <input type="number" name="barang[{{ $index }}][jumlah_terima]" class="form-control" min="1" max="{{ $item['jumlah'] }}">
-                    </div>
-                </div>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
             @endforeach
-
-            <button type="submit" class="btn btn-primary">Simpan Penerimaan</button>
-        </form>
+        </div>
     @endif
+
+    <form action="{{ route('penerimaan.store', $pengadaan['id_pengadaan']) }}" method="POST">
+        @csrf
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Nama Barang</th>
+                    <th>Jumlah Dipesan</th>
+                    <th>Jumlah Diterima Sebelumnya</th>
+                    <th>Jumlah Diterima Sekarang</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($barangItems as $index => $item)
+                <tr>
+                    <td>
+                        {{ $item['nama_barang'] }}
+                        <input type="hidden" name="barang[{{ $index }}][id_barang]" value="{{ $item['id_barang'] }}">
+                    </td>
+                    <td>
+                        <input type="number" class="form-control" value="{{ $item['jumlah_dipesan'] }}" readonly>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control" value="{{ $item['jumlah_diterima'] }}" readonly>
+                    </td>
+                    <td>
+                        <input type="number" name="barang[{{ $index }}][jumlah_terima]"
+                               class="form-control"
+                               min="1"
+                               max="{{ $item['jumlah_dipesan'] - $item['jumlah_diterima'] }}"
+                               placeholder="Masukkan jumlah"
+                               required>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary mt-3">Simpan Penerimaan</button>
+    </form>
 </div>
 @endsection

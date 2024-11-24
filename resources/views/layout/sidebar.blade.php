@@ -70,15 +70,23 @@
             <span>
               <i class="ti ti-cards"></i>
             </span>
-            <span class="hide-menu">pengadaan</span>
+            <span class="hide-menu">create pengadaan</span>
           </a>
         </li>
         <li class="sidebar-item">
-          <a class="sidebar-link" href="{{ url('/pengadaan/{id}/detail') }}" aria-expanded="false">
+            <a class="sidebar-link" href="{{ url('view/penerimaan') }}" aria-expanded="false">
+              <span>
+                <i class="ti ti-login"></i>
+              </span>
+              <span class="hide-menu">daftar penerimaan </span>
+            </a>
+          </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{ url('/kartu-stok') }}" aria-expanded="false">
             <span>
               <i class="ti ti-login"></i>
             </span>
-            <span class="hide-menu">Detail pengadaan</span>
+            <span class="hide-menu">kartu stock </span>
           </a>
         </li>
 

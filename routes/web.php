@@ -10,6 +10,8 @@ use App\Http\Controllers\PengadaanPenerimaanController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DetailPengadaanController;
 use App\Http\Controllers\SatuanController;
+use App\Http\Controllers\ReturController;
+use App\Http\Controllers\KartuStockController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -70,6 +72,29 @@ Route::get('/pengadaan', [PengadaanPenerimaanController::class, 'indexPengadaan'
 Route::get('/pengadaan/{id}/detail', [PengadaanPenerimaanController::class, 'detailPengadaan'])->name('pengadaan.detail');
 Route::get('/pengadaan/{id}/terima', [PengadaanPenerimaanController::class, 'createPenerimaan'])->name('penerimaan.create');
 Route::post('/pengadaan/{id}/terima', [PengadaanPenerimaanController::class, 'storePenerimaan'])->name('penerimaan.store');
+
+Route::get('view/penerimaan', [PengadaanPenerimaanController::class, 'indexPenerimaan'])->name('penerimaan.index');
+
+
+// retur
+
+// Route::get('/retur/create/{id_penerimaan}', [ReturController::class, 'create'])->name('retur.create');
+
+// // Route untuk menampilkan form retur
+// // Route::get('/retur/create/{id_penerimaan}', [ReturController::class, 'create'])->name('retur.create');
+
+// // Route untuk menyimpan data retur
+// Route::post('/retur/store/{id_penerimaan}', [ReturController::class, 'store'])->name('retur.store');
+
+// // Route untuk menampilkan daftar retur
+Route::get('/retur', [ReturController::class, 'index'])->name('retur.index');
+
+
+Route::get('retur/create/{id_penerimaan}', [ReturController::class, 'create'])->name('retur.create');
+Route::post('retur/store/{id_penerimaan}', [ReturController::class, 'store'])->name('retur.store');
+
+// kartu stock
+Route::get('/kartu-stok', [KartuStockController::class, 'indexKartuStok'])->name('kartuStok.index');
 
 
 });
