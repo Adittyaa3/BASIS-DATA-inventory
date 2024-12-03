@@ -12,6 +12,8 @@ use App\Http\Controllers\DetailPengadaanController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\ReturController;
 use App\Http\Controllers\KartuStockController;
+use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\MarginController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -97,5 +99,11 @@ Route::post('retur/store/{id_penerimaan}', [ReturController::class, 'store'])->n
 Route::get('/kartu-stok', [KartuStockController::class, 'indexKartuStok'])->name('kartuStok.index');
 
 
+Route::get('penjualan/create', [PenjualanController::class, 'index'])->name('penjualan.create');
+Route::post('penjualan/store', [PenjualanController::class, 'store'])->name('penjualan.store');
+
+
+
+Route::resource('margin', MarginController::class);
 });
 

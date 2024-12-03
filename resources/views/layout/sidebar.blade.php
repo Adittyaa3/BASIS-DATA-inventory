@@ -61,6 +61,14 @@
             <span class="hide-menu">satuan</span>
           </a>
         </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ url('margin    ') }}" aria-expanded="false">
+              <span>
+                <i class="ti ti-typography"></i>
+              </span>
+              <span class="hide-menu">margin</span>
+            </a>
+          </li>
         <li class="nav-small-cap">
           <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
           <span class="hide-menu">activity</span>
@@ -92,14 +100,14 @@
 
         <li class="nav-small-cap">
           <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-          <span class="hide-menu">DETAIL</span>
+          <span class="hide-menu"></span>
         </li>
         <li class="sidebar-item">
-          <a class="sidebar-link" href="{{ url('/procurement/{id_pengadaan}/details') }}" aria-expanded="false">
+          <a class="sidebar-link" href="{{ url('penjualan/create') }}" aria-expanded="false">
             <span>
               <i class="ti ti-login"></i>
             </span>
-            <span class="hide-menu">Detail pengadaan</span>
+            <span class="hide-menu">jual</span>
           </a>
         </li>
         <li class="sidebar-item">
