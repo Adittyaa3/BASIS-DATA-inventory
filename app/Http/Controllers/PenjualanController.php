@@ -50,7 +50,7 @@ class PenjualanController extends Controller
             $subtotal += $request->subtotal[$index];
         }
 
-        $ppn = ($subtotal * 10 / 100);
+        $ppn = ($subtotal * 11 / 100);
         $statement = $this->pdo->prepare('SELECT get_margin_persen(:id) AS persen_margin;');
         $statement->execute([
             'id' => $request->margin

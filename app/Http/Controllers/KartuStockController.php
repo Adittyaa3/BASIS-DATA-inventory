@@ -19,5 +19,16 @@ class KartuStockController extends Controller
         return view('kartuStock.index', compact('kartuStokData'));
     }
 
+    public function indexKartuStok2()
+    {
+        $pdo = DB::connection()->getPdo();
+
+        // Ambil data dari view kartu_stok_view
+        $kartuStokData = $pdo->query("SELECT * FROM view_masuk_keluar_stok")->fetchAll(PDO::FETCH_ASSOC);
+
+        // Kirim data ke blade
+        return view('kartuStock.kartustok2', compact('kartuStokData'));
+    }
+
 
 }

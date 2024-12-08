@@ -97,6 +97,7 @@ Route::post('retur/store/{id_penerimaan}', [ReturController::class, 'store'])->n
 
 // kartu stock
 Route::get('/kartu-stok', [KartuStockController::class, 'indexKartuStok'])->name('kartuStok.index');
+Route::get('/kartu-stok2', [KartuStockController::class, 'indexKartuStok2'])->name('kartuStok.index');
 
 
 Route::get('penjualan/create', [PenjualanController::class, 'index'])->name('penjualan.create');

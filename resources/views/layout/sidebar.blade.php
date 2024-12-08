@@ -89,6 +89,10 @@
               <span class="hide-menu">daftar penerimaan </span>
             </a>
           </li>
+          <li class="nav-small-cap">
+            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+            <span class="hide-menu">stok</span>
+          </li>
         <li class="sidebar-item">
           <a class="sidebar-link" href="{{ url('/kartu-stok') }}" aria-expanded="false">
             <span>
@@ -97,6 +101,14 @@
             <span class="hide-menu">kartu stock </span>
           </a>
         </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ url('/kartu-stok2') }}" aria-expanded="false">
+              <span>
+                <i class="ti ti-login"></i>
+              </span>
+              <span class="hide-menu">kartu stock 2</span>
+            </a>
+          </li>
 
         <li class="nav-small-cap">
           <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
