@@ -20,9 +20,7 @@ class UserController extends Controller
     {
         // Mengambil data user bersama nama role-nya (JOIN)
         $users = $this->db->query(
-            "SELECT u.id_user, u.username, r.nama_role
-            FROM user u
-            JOIN role r ON u.id_role = r.id_role"
+            "SELECT * FROM view_user"
         )->fetchAll(PDO::FETCH_ASSOC);
 
         return view('user.index', compact('users'));

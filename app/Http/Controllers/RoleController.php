@@ -25,7 +25,7 @@ class RoleController extends Controller
     // Read Roles
     public function index()
     {
-        $roles = $this->db->query("SELECT * FROM role")->fetchAll(PDO::FETCH_ASSOC);
+        $roles = $this->db->query("SELECT * FROM view_role")->fetchAll(PDO::FETCH_ASSOC);
         return view('role.index', compact('roles'));
     }
 

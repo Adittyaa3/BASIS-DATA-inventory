@@ -26,7 +26,7 @@
             <div class="card">
                 <div class="card-body p-4">
                     <h5 class="card-title fw-semibold mb-4">Daftar Satuan</h5>
-                    <a href="{{ route('satuan.create') }}" class="btn btn-success mb-3">Tambah Satuan</a>
+                    {{-- <a href="{{ route('satuan.create') }}" class="btn btn-success mb-3">Tambah Satuan</a> --}}
                     <div class="table-responsive">
                         <table class="table text-nowrap mb-0 align-middle">
                             <thead class="text-dark fs-4">
@@ -51,7 +51,7 @@
                                     </td>
                                     <td class="border-bottom-0">
                                         <a href="{{ route('satuan.edit', $satuan['id_satuan']) }}" class="btn btn-primary btn-sm">Edit</a>
-                                        
+
                                         @if($satuan['status'] == 1)
                                             <form action="{{ route('satuan.delete', $satuan['id_satuan']) }}" method="POST" style="display:inline">
                                                 @csrf

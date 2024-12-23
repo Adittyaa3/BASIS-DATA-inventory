@@ -59,16 +59,38 @@ class PenjualanController extends Controller
 
         $marginValue = ($subtotal * $margin['persen_margin'] / 100);
         $total = $subtotal + $ppn + $marginValue;
-        $statement = $this->pdo->prepare('CALL insert_penjualan(:subtotal_nilai, :ppn, :total_nilai, :id_user, :id_margin, :detail_penjualan)');
-        $statement->execute([
-            'subtotal_nilai' => $subtotal,
-            'ppn' => $ppn,
-            'total_nilai' => $total,
-            'id_user' => $userId,
-            'id_margin' => $request->margin,
-            'detail_penjualan' => json_encode($details)
-        ]);
 
-        return redirect()->back()->with('success', 'Penjualan berhasil disimpan.');
+        try {
+            $statement = $this->pdo->prepare('CALL insert_penjualan(:subtotal_nilai, :ppn, :total_nilai, :id_user, :id_margin, :detail_penjualan)');
+            $statement->execute([
+                'subtotal_nilai' => $subtotal,
+                'ppn' => $ppn,
+                'total_nilai' => $total,
+                'id_user' => $userId,
+                'id_margin' => $request->margin,
+                'detail_penjualan' => json_encode($details)
+            ]);
+            return redirect()->back()->with('success', 'Penjualan berhasil disimpan.');
+        } catch (\PDOException $e) {
+            // Tangani error jika stok tidak tersedia di kartu_stok
+            if (strpos($e->getMessage(), 'Stok barang tidak tersedia di kartu stok') !== false) {
+                return redirect()->back()->withErrors('Stok barang tidak tersedia di kartu stok');
+            }
+            // Tangani error lainnya
+            return redirect()->back()->withErrors('Terjadi kesalahan saat menyimpan data penjualan');
+        }
+    }
+
+
+    public function show($id)
+    {
+        // Memanggil fungsi get_total_penjualan
+        $statement = $this->pdo->prepare('SELECT get_total_penjualan(:id) AS total_baris');
+        $statement->execute(['id' => $id]);
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        $totalBaris = $result['total_baris'];
+
+        return view('penjualan.show', compact('totalBaris'));
     }
 }

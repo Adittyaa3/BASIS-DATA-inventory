@@ -75,6 +75,9 @@ Route::get('/pengadaan/{id}/detail', [PengadaanPenerimaanController::class, 'det
 Route::get('/pengadaan/{id}/terima', [PengadaanPenerimaanController::class, 'createPenerimaan'])->name('penerimaan.create');
 Route::post('/pengadaan/{id}/terima', [PengadaanPenerimaanController::class, 'storePenerimaan'])->name('penerimaan.store');
 
+Route::get('/pengadaan/detail2', [PengadaanPenerimaanController::class, 'listdetailPengadaan'])->name('pengadaan.detailall');
+Route::get('/penerimaan/detail2', [PengadaanPenerimaanController::class, 'listdetailPenerimaanView'])->name('penerimaan.detailall');
+
 Route::get('view/penerimaan', [PengadaanPenerimaanController::class, 'indexPenerimaan'])->name('penerimaan.index');
 
 
@@ -94,14 +97,19 @@ Route::get('/retur', [ReturController::class, 'index'])->name('retur.index');
 
 Route::get('retur/create/{id_penerimaan}', [ReturController::class, 'create'])->name('retur.create');
 Route::post('retur/store/{id_penerimaan}', [ReturController::class, 'store'])->name('retur.store');
+Route::get('detail/retur', [ReturController::class, 'detailReturView'])->name('retur.detail');
 
 // kartu stock
 Route::get('/kartu-stok', [KartuStockController::class, 'indexKartuStok'])->name('kartuStok.index');
-Route::get('/kartu-stok2', [KartuStockController::class, 'indexKartuStok2'])->name('kartuStok.index');
+Route::get('/kartu-stok2', [KartuStockController::class, 'indexKartuStok2'])->name('kartuStok2.index');
+Route::get('/daftar/penjualan', [KartuStockController::class, 'daftarpenjualan'])->name('penjualan.index');
+Route::get('/daftar/summary', [KartuStockController::class, 'indexSummary'])->name('summary.index');
 
 
 Route::get('penjualan/create', [PenjualanController::class, 'index'])->name('penjualan.create');
 Route::post('penjualan/store', [PenjualanController::class, 'store'])->name('penjualan.store');
+
+
 
 
 

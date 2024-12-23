@@ -11,7 +11,7 @@ class MarginController extends Controller
     // Menampilkan semua margin penjualan yang aktif
     public function index()
     {
-        $margins = DB::select('SELECT * FROM margin_penjualan WHERE status = 1');
+        $margins = DB::select('SELECT * FROM view_margin_penjualan');
         return view('margin.index', compact('margins'));
     }
 

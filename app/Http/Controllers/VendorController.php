@@ -19,7 +19,7 @@ class VendorController extends Controller
     public function index()
     {
         // Mengambil data vendor dengan status aktif (1)
-        $vendors = $this->db->query("SELECT * FROM vendor WHERE status = 1")->fetchAll(PDO::FETCH_ASSOC);
+        $vendors = $this->db->query("SELECT * FROM view_vendor")->fetchAll(PDO::FETCH_ASSOC);
         return view('vendor.index', compact('vendors'));
     }
 
@@ -71,13 +71,13 @@ class VendorController extends Controller
             'nama_vendor' => 'required',
             'badan_hukum' => 'required|in:Y,N'
         ]);
-    
+
         // Ambil status dari request jika ada, jika tidak, gunakan nilai saat ini dari database
         $status = $request->has('status') ? $request->status : $this->db->query(
-            "SELECT status FROM vendor WHERE id_vendor = ?", 
+            "SELECT status FROM vendor WHERE id_vendor = ?",
             [$id]
         )->fetchColumn();
-    
+
         // Update data vendor
         $this->db->query(
             "UPDATE vendor SET nama_vendor = ?, badan_hukum = ?, status = ? WHERE id_vendor = ?",
@@ -88,10 +88,10 @@ class VendorController extends Controller
                 $id
             ]
         );
-    
+
         return redirect()->route('vendor.index')->with('success', 'Vendor berhasil diperbarui!');
     }
-    
+
 
     // Menghapus data vendor secara soft delete
     public function delete($id)

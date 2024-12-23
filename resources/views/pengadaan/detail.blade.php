@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h2>Detail Pengadaan</h2>
-    
+
     @if($pengadaan)
         <p><strong>Pengadaan ID:</strong> {{ $pengadaan['id_pengadaan'] }}</p>
         <p><strong>Vendor:</strong> {{ $pengadaan['vendor_id_vendor'] }}</p>
@@ -37,3 +37,4 @@
     <a href="{{ route('penerimaan.create', $pengadaan['id_pengadaan']) }}" class="btn btn-primary">Terima Barang</a>
 </div>
 @endsection
+

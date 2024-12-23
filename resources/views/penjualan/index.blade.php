@@ -95,7 +95,7 @@
         });
         document.getElementById('subtotal_nilai').value = subtotalNilai;
 
-        const ppn = subtotalNilai * 0.1; // PPN 10%
+        const ppn = subtotalNilai * 0.11; // PPN 10%
         document.getElementById('ppn').value = ppn;
 
         const totalNilai = subtotalNilai + ppn;

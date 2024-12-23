@@ -218,5 +218,25 @@ public function indexPenerimaan()
     return view('terima.index', compact('dataPenerimaan'));
 }
 
+public function listdetailpengadaan(){
+    $pdo = DB::connection()->getPdo();
+
+    $detailpengadaan = $pdo->query("SELECT * FROM view_detail_pengadaan")->fetchAll(PDO::FETCH_ASSOC);
+
+    return view('viewDetail.detailpengadaan', compact('detailpengadaan'));
+
+}
+
+public function listdetailPenerimaanView()
+    {
+        $pdo = DB::connection()->getPdo();
+
+        // Ambil data dari view view_detail_penerimaan
+        $detailpenerimaan = $pdo->query("SELECT * FROM view_detail_penerimaan")->fetchAll(PDO::FETCH_ASSOC);
+
+        // Kirim data ke blade
+        return view('viewDetail.detailpenerimaan', compact('detailpenerimaan'));
+    }
+
 
 }

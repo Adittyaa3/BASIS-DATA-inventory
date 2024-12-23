@@ -1,4 +1,4 @@
-<!--  Header Start -->
+    <!--  Header Start -->
 <header class="app-header">
   <nav class="navbar navbar-expand-lg navbar-light">
     <ul class="navbar-nav">
@@ -38,12 +38,12 @@
               <form id="logout-form" action="{{ url('logout') }}" method="POST" style="display: none;">
                 @csrf
             </form>
-            <a href="{{ url('logout') }}" 
+            <a href="{{ url('logout') }}"
                class="btn btn-outline-primary mx-3 mt-2 d-block"
                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 Logout
             </a>
-            
+
             </div>
           </div>
         </li>

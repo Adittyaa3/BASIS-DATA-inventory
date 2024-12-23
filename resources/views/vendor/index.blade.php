@@ -34,7 +34,7 @@
                                     </td>
                                     <td class="border-bottom-0">
                                         <a href="{{ route('vendor.edit', $vendor['id_vendor']) }}" class="btn btn-primary btn-sm">Edit</a>
-                                        
+
                                         @if($vendor['status'] == 1)
                                             <form action="{{ route('vendor.delete', $vendor['id_vendor']) }}" method="POST" style="display:inline">
                                                 @csrf

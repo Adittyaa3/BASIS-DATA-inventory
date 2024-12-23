@@ -70,7 +70,7 @@ class SatuanController extends Controller
 
         // Memastikan status sesuai data terbaru atau mengambil dari input
         $status = $request->has('status') ? $request->status : $this->db->query(
-            "SELECT status FROM satuan WHERE id_satuan = ?", 
+            "SELECT status FROM satuan WHERE id_satuan = ?",
             [$id]
         )->fetchColumn();
 

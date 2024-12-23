@@ -19,10 +19,7 @@ class BarangController extends Controller
     public function index()
     {
         $barangs = $this->db->query(
-            "SELECT b.id_barang, b.jenis, b.nama, s.nama_satuan, b.harga
-             FROM barang b
-             JOIN satuan s ON b.id_satuan = s.id_satuan
-             WHERE s.status = 1" // Status satuan tetap difilter jika diperlukan
+            "SELECT * FROM view_barang"
         )->fetchAll(PDO::FETCH_ASSOC);
 
         return view('barang.index', compact('barangs'));

@@ -89,4 +89,15 @@ class ReturController extends Controller
             return back()->withErrors(['error' => 'Gagal memproses retur: ' . $e->getMessage()]);
         }
     }
+
+    public function detailReturView()
+    {
+        $pdo = DB::connection()->getPdo();
+
+        // Ambil data dari view view_detail_retur
+        $detailretur = $pdo->query("SELECT * FROM view_detail_retur")->fetchAll(PDO::FETCH_ASSOC);
+
+        // Kirim data ke blade
+        return view('viewDetail.detailretur', compact('detailretur'));
+    }
 }
